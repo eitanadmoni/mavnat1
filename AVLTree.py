@@ -185,7 +185,16 @@ class AVLTree(object):
 	@returns: node corresponding to key.
 	"""
 	def search(self, key):
-		return None
+		crnt_node = self.get_root() # type: AVLNode
+		while crnt_node.is_real_node():
+			dif = key - crnt_node.get_key()
+			if dif == 0: # current node is the one searched for
+				return crnt_node
+			if dif > 0: # bigger goes right, smaller goes left
+				crnt_node = crnt_node.get_right()
+			else:
+				crnt_node = crnt_node.get_left()
+		return crnt_node
 
 
 	"""inserts val at position i in the dictionary
