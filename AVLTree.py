@@ -164,9 +164,22 @@ class AVLNode(object):
 	@returns: False if self is a virtual node, True otherwise.
 	"""
 	def is_real_node(self):
-		if(get_key(self) == None):
+		if(self.get_key() == None):
 			return False
 		return True
+
+	"""
+	Creates a virtual node with a parent
+	
+	@type parent: AVLNode or None
+	@rtype: AVLNode
+	"""
+	@staticmethod
+	def create_virtual_node (parent=None):
+		node = AVLNode(None,None)
+		node.set_parent(parent)
+		return node
+
 
 
 
