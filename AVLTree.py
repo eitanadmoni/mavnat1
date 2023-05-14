@@ -24,6 +24,7 @@ class AVLNode(object):
 		self.parent = None
 		self.height = -1
 		self.size = 0
+		self.BF = 0
 		
 
 	"""returns the key
@@ -86,6 +87,12 @@ class AVLNode(object):
 	"""
 	def get_size(self):
 		return self.size
+
+	""" returns the BF of the subtree
+	@:rtype: int
+	"""
+	def get_BF(self):
+		return self.BF
 
 
 	"""sets key
@@ -157,6 +164,14 @@ class AVLNode(object):
 		self.size = s
 		return None
 
+	"""sets the BF of the node
+	@type bf: int
+	"""
+	def set_BF(self, bf):
+		self.BF = bf
+
+
+
 
 	"""returns whether self is not a virtual node 
 
@@ -194,7 +209,7 @@ class AVLTree(object):
 
 	"""
 	def __init__(self):
-		self.root = None
+		self.root = AVLNode(None, None)
 		# add your fields here
 
 
@@ -230,7 +245,30 @@ class AVLTree(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def insert(self, key, val):
-		return -1
+		if self.root.is_real_node():
+			self.root = AVLNode(key, val)
+			self.root.set_size(1)
+			self.root.set_height(0)
+			self.root.set_right(AVLNode.create_virtual_node(self.root))
+			self.root.set_left(AVLNode.create_virtual_node(self.root))
+			self.root.set_BF(0)
+			return 0
+		else:
+			current_node = self.root
+			while current_node.is_real_node():
+				if current_node.get_key() > key:
+					current_node = current_node.left
+				else:
+					current_node = current_node.right
+			current_node.set_key(key)
+			current_node.set_value(val)
+			current_node.set_size(1)
+			current_node.set_height(0)
+			current_node.set_BF(0)
+			current_node.set_left(AVLNode.create_virtual_node())
+			current_node.set_right(AVLNode.create_virtual_node())
+
+
 
 
 	"""deletes node from the dictionary
