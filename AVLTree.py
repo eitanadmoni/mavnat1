@@ -190,12 +190,16 @@ class AVLNode(object):
 	@rtype: AVLNode
 	"""
 	@staticmethod
-	def create_virtual_node (parent=None):
-		node = AVLNode(None,None)
+	def create_virtual_node(parent=None):
+		node = AVLNode(None, None)
 		node.set_parent(parent)
 		return node
 
 
+	"""find successor of the node
+	
+	@rtype: AVLNode
+	"""
 	def find_successor(self):
 		current_node = self.get_right()
 		while current_node.is_real_node():
@@ -370,7 +374,8 @@ class AVLTree(object):
 	@returns: the rank of node in self
 	"""
 	def rank(self, node):
-		return None
+		left_son = node.get_left()
+		return left_son.get_size()
 
 
 	"""finds the i'th smallest item (according to keys) in self
