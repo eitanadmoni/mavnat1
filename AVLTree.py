@@ -374,8 +374,16 @@ class AVLTree(object):
 	@returns: the rank of node in self
 	"""
 	def rank(self, node):
-		left_son = node.get_left()
-		return left_son.get_size()
+		rank = 0
+		current_node = self.root
+		while current_node.get_key() != node.get_key():
+			if current_node.get_key() > node.get_key():
+				current_node = current_node.get_left()
+			else:
+				rank += current_node.get_left().get_size +1
+				current_node = current_node.get_right()
+		rank += current_node.get_left().get_size()
+		return rank
 
 
 	"""finds the i'th smallest item (according to keys) in self
@@ -396,4 +404,4 @@ class AVLTree(object):
 	@returns: the root, None if the dictionary is empty
 	"""
 	def get_root(self):
-		return None
+		return self.root
