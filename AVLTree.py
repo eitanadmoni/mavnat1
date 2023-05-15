@@ -294,8 +294,10 @@ class AVLTree(object):
 			parent.set_left(current_node.left)
 		else:
 			successor = find_successor(current_node)
+			current_node.set_key(successor.get_key())
 			successor.get_right().set_parent(successor.get_parent())
 			successor.get_parent().set_left(successor.get_right())
+		return balance_after_delete(current_node)
 
 
 
