@@ -196,6 +196,14 @@ class AVLNode(object):
 		return node
 
 
+	def find_successor(self):
+		current_node = self.get_right()
+		while current_node.is_real_node():
+			current_node = current_node.get_left()
+		return current_node.get_parent()
+
+
+
 
 
 """
@@ -234,16 +242,6 @@ class AVLTree(object):
 		return crnt_node
 
 
-
-
-
-
-
-	def find_successor(self, node):
-		current_node = node.get_right()
-		while current_node.is_real_node():
-			current_node = current_node.get_left()
-		return current_node.get_parent()
 
 
 	"""inserts val at position i in the dictionary
@@ -305,7 +303,7 @@ class AVLTree(object):
 			parent.set_right(current_node.right)
 			parent.set_left(current_node.left)
 		else:
-			successor = find_successor(current_node)
+			successor = current_node.find_successor()
 			current_node.set_key(successor.get_key())
 			successor.get_right().set_parent(successor.get_parent())
 			successor.get_parent().set_left(successor.get_right())
