@@ -364,6 +364,16 @@ class AVLTree(object):
 			AVLTree.roll(node, R)
 		return 2
 
+	@staticmethod
+	def calcNeededRoll (node: AVLNode):
+		if node.get_BF() == -2:
+			if node.get_right().get_BF() <= 0:
+				return L
+			return RL
+		if node.get_left().get_BF() >= 0:
+			return R
+		return LR
+
 
 
 
