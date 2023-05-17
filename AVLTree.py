@@ -8,6 +8,7 @@ from __future__ import annotations
 
 
 
+
 """A class represnting a node in an AVL tree"""
 
 class AVLNode(object):
@@ -316,7 +317,31 @@ class AVLTree(object):
 			current_node.set_BF(0)
 			current_node.set_left(AVLNode.create_virtual_node())
 			current_node.set_right(AVLNode.create_virtual_node())
-			return self.balance(current_node)
+			return AVLTree.balance_after_insertion(current_node)
+
+	@staticmethod
+	def basic_roll (node: AVLNode, is_left_roll=False):
+		rootParent = node.get_parent()
+		realGetLeft = AVLNode.get_left
+		realGetRight = AVLNode.get_right
+		realSetLeft = AVLNode.set_left
+		realSetRight = AVLNode.et_right
+		if is_left_roll:
+			realGetLeft = AVLNode.get_right
+			realGetRight = AVLNode.get_left
+			realSetLeft = AVLNode.get_right
+			realSetRight = AVLNode.get_left
+		leftChild = realGetLeft(node)
+		leftRightChild = realGetRight(node, leftChild)
+		realSetRight(node, leftRightChild)
+		node.update()
+		realSetRight(leftChild, node)
+		leftChild.update()
+		if node.is_right_child():
+			rootParent.set_right(leftChild)
+		else:
+			rootParent.set_left(leftChild)
+		rootParent.update()
 
 
 	"""Perform a basic roll operation
@@ -327,42 +352,27 @@ class AVLTree(object):
 	"""
 	@staticmethod
 	def roll (node: AVLNode, direction: int):
-		rootParent = node.get_parent()
-		isRightChild = node.is_right_child()
-		leftChild = node.get_left()
-		rightChild = node.get_left()
-		if direction == R: #right roll.
-			leftRightChild = leftChild.get_left()
-			node.set_left(leftRightChild)
-			node.update()
-			leftChild.set_right(node)
-			leftChild.update()
-			if isRightChild:
-				rootParent.set_right(leftChild)
-			else:
-				rootParent.set_left(leftChild)
-			rootParent.update()
+		if direction in (R, L):
+			left_roll = direction == L
+			AVLTree.basic_roll(node, is_left_roll=left_roll)
 			return 1
-		elif direction == L: #left roll.
-			rightLeftChild = rightChild.get_left()
-			node.set_right(rightLeftChild)
-			node.update()
-			rightChild.set_left(node)
-			rightChild.update()
-			if isRightChild:
-				rootParent.set_right(rightChild)
-			else:
-				rootParent.set_right(rightChild)
 		elif direction == RL:
 			AVLTree.roll(node.right, R)
 			AVLTree.roll(node, L)
-			return 2
 		else:
 			AVLTree.roll(node.left, L)
 			AVLTree.roll(node, R)
-			return 2
-		rootParent.update()
-		return 1
+		return 2
+
+	@staticmethod
+	def calcNeededRoll (node: AVLNode):
+		if node.get_BF() == -2:
+			if node.get_right().get_BF() <= 0:
+				return L
+			return RL
+		if node.get_left().get_BF() >= 0:
+			return R
+		return LR
 
 
 
@@ -391,12 +401,10 @@ class AVLTree(object):
 			parent.set_left(current_node.left)
 		else:
 			successor = current_node.find_successor()
-			successor_parent = successor.get_parent()
 			current_node.set_key(successor.get_key())
-			successor.get_right().set_parent(successor_parent)
-			successor_parent.set_left(successor.get_right())
-			current_node = successor_parent.get_left()
-		return self.balance(current_node, True)
+			successor.get_right().set_parent(successor.get_parent())
+			successor.get_parent().set_left(successor.get_right())
+		return balance_after_delete(current_node)
 
 
 
@@ -405,25 +413,25 @@ class AVLTree(object):
 
 
 
-	def balance(self, node, is_delete = False):
-		balnce_number = 0
+	def balance_after_insertion(self, node):
 		parent = node.get_parent()
 		while parent is not None:
 			previus_height = parent.get_height()
 			parent.update()
 			if abs(parent.get_BF()) == 2:
-				if not is_delete:
-					return AVLTree.roll(parent, AVLTree.calcNeededRoll(parent))
-				balnce_number += AVLTree.roll(parent, AVLTree.calcNeededRoll(parent))
+				if parent.get_BF() == 2:
+					if parent.get_left().get_BF() == 1:
+						return roll(parent, R)
+					else:
+						return roll(parent, LR)
+				else:
+					if parent.get_right().get_BF() == 1:
+						return roll(parent, RL)
+					else:
+						return roll(parent, L)
 			if previus_height == parent.get_height:
 				break
-		return balnce_number
-
-
-
-
-
-
+		pass
 
 
 
