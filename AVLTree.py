@@ -4,6 +4,8 @@
 #id2      - 323832949
 #name2    - Eitan Admoni
 
+from __future__ import annotations
+
 
 
 """A class represnting a node in an AVL tree"""
@@ -32,7 +34,7 @@ class AVLNode(object):
 	@rtype: int or None
 	@returns: the key of self, None if the node is virtual
 	"""
-	def get_key(self):
+	def get_key(self) -> int or None:
 		return self.key
 
 
@@ -49,16 +51,15 @@ class AVLNode(object):
 	@rtype: AVLNode
 	@returns: the left child of self, None if there is no left child (if self is virtual)
 	"""
-	def get_left(self):
+	def get_left(self) -> AVLNode:
 		return self.left
-
 
 	"""returns the right child
 
 	@rtype: AVLNode
 	@returns: the right child of self, None if there is no right child (if self is virtual)
 	"""
-	def get_right(self):
+	def get_right(self) -> AVLNode:
 		return self.right
 
 
@@ -67,7 +68,7 @@ class AVLNode(object):
 	@rtype: AVLNode
 	@returns: the parent of self, None if there is no parent
 	"""
-	def get_parent(self):
+	def get_parent(self) -> AVLNode:
 		return self.parent
 
 
@@ -76,7 +77,7 @@ class AVLNode(object):
 	@rtype: int
 	@returns: the height of self, -1 if the node is virtual
 	"""
-	def get_height(self):
+	def get_height(self) -> int:
 		return self.height
 
 
@@ -85,13 +86,13 @@ class AVLNode(object):
 	@rtype: int
 	@returns: the size of the subtree of self, 0 if the node is virtual
 	"""
-	def get_size(self):
+	def get_size(self) -> int:
 		return self.size
 
 	""" returns the BF of the subtree
 	@:rtype: int
 	"""
-	def get_BF(self):
+	def get_BF(self) -> int:
 		return self.BF
 
 
@@ -120,7 +121,7 @@ class AVLNode(object):
 	@type node: AVLNode
 	@param node: a node
 	"""
-	def set_left(self, node):
+	def set_left(self, node : AVLNode):
 		self.left = node
 		return None
 
@@ -130,7 +131,7 @@ class AVLNode(object):
 	@type node: AVLNode
 	@param node: a node
 	"""
-	def set_right(self, node):
+	def set_right(self, node : AVLNode):
 		self.right = node
 		return None
 
@@ -140,7 +141,7 @@ class AVLNode(object):
 	@type node: AVLNode
 	@param node: a node
 	"""
-	def set_parent(self, node):
+	def set_parent(self, node : AVLNode):
 		self.parent = node
 		return None
 
@@ -169,6 +170,18 @@ class AVLNode(object):
 	"""
 	def set_BF(self, bf):
 		self.BF = bf
+
+	def update_size (self):
+		if not self.is_real_node():
+			self.set_size(0)
+		else:
+			self.set_size(self.get_left().get_size() + self.get_right().get_size())
+
+	def update_height (self):
+		self.set_size(max(self.get_right().get_size(), self.get_left().get_size()) + 1)
+
+	def update_BF (self):
+		self.set_BF(self.get_left().get_height() - self.get_right().get_height())
 
 
 
@@ -208,6 +221,10 @@ class AVLNode(object):
 
 
 
+R = 0
+L = 1
+RL = 2
+LR = 3
 
 
 """
@@ -282,6 +299,23 @@ class AVLTree(object):
 			current_node.set_left(AVLNode.create_virtual_node())
 			current_node.set_right(AVLNode.create_virtual_node())
 			return balance_after_insertion(current_node)
+
+
+	"""Perform a basic roll operation
+	@:param node: the root node of the roll
+	For example, roll right is for the case:
+	A->((B->(C)) becomes B->(C, A)
+	Returns the new root node of the subtree
+	"""
+	def roll (node: AVLNode, direction: int):
+		leftChild = node.get_left()
+		rightChild = node.get_right()
+		if direction == R: #right roll.
+			leftRightChild = leftChild.get_left()
+			node.set_left(leftRightChild)
+			leftChild.set_right(node)
+
+
 
 
 
