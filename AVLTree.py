@@ -201,11 +201,16 @@ class AVLNode(object):
 	@rtype: AVLNode
 	"""
 	def find_successor(self):
-		current_node = self.get_right()
-		while current_node.is_real_node():
-			current_node = current_node.get_left()
-		return current_node.get_parent()
-
+		if self.get_right().is_real_node():
+			current_node = self.get_right()
+			while current_node.is_real_node():
+				current_node = current_node.get_left()
+			return current_node.get_parent()
+		else:
+			parent = self.get_parent()
+			while parent.get_key() < self.get_key():
+				parent = parent.get_parent()
+			return parent
 
 
 
