@@ -183,6 +183,14 @@ class AVLNode(object):
 	def update_BF (self):
 		self.set_BF(self.get_left().get_height() - self.get_right().get_height())
 
+	"""Update properties of node
+	Requirements: children's properties are updated
+	"""
+	def update (self):
+		self.update_size()
+		self.update_height()
+		self.update_BF()
+
 
 
 
