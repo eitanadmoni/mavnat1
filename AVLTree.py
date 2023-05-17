@@ -421,6 +421,7 @@ class AVLTree(object):
 						return roll(parent, L)
 			if previus_height == parent.get_height:
 				break
+		pass
 
 
 
