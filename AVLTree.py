@@ -227,11 +227,16 @@ class AVLNode(object):
 	@rtype: AVLNode
 	"""
 	def find_successor(self):
-		current_node = self.get_right()
-		while current_node.is_real_node():
-			current_node = current_node.get_left()
-		return current_node.get_parent()
-
+		if self.get_right().is_real_node():
+			current_node = self.get_right()
+			while current_node.is_real_node():
+				current_node = current_node.get_left()
+			return current_node.get_parent()
+		else:
+			parent = self.get_parent()
+			while parent.get_key() < self.get_key():
+				parent = parent.get_parent()
+			return parent
 
 
 R = 0
@@ -390,6 +395,35 @@ class AVLTree(object):
 			successor.get_right().set_parent(successor.get_parent())
 			successor.get_parent().set_left(successor.get_right())
 		return balance_after_delete(current_node)
+
+
+
+
+
+
+
+
+	def balance_after_insertion(self, node):
+		parent = node.get_parent()
+		while parent is not None:
+			previus_height = parent.get_height()
+			parent.update()
+			if abs(parent.get_BF()) == 2:
+				if parent.get_BF() == 2:
+					if parent.get_left().get_BF() == 1:
+						return roll(parent, R)
+					else:
+						return roll(parent, LR)
+				else:
+					if parent.get_right().get_BF() == 1:
+						return roll(parent, RL)
+					else:
+						return roll(parent, L)
+			if previus_height == parent.get_height:
+				break
+
+
+
 
 
 
