@@ -190,10 +190,22 @@ class AVLNode(object):
 	@rtype: AVLNode
 	"""
 	@staticmethod
-	def create_virtual_node (parent=None):
-		node = AVLNode(None,None)
+	def create_virtual_node(parent=None):
+		node = AVLNode(None, None)
 		node.set_parent(parent)
 		return node
+
+
+	"""find successor of the node
+	
+	@rtype: AVLNode
+	"""
+	def find_successor(self):
+		current_node = self.get_right()
+		while current_node.is_real_node():
+			current_node = current_node.get_left()
+		return current_node.get_parent()
+
 
 
 
@@ -234,6 +246,8 @@ class AVLTree(object):
 		return crnt_node
 
 
+
+
 	"""inserts val at position i in the dictionary
 
 	@type key: int
@@ -257,9 +271,9 @@ class AVLTree(object):
 			current_node = self.root
 			while current_node.is_real_node():
 				if current_node.get_key() > key:
-					current_node = current_node.left
+					current_node = current_node.get_left()
 				else:
-					current_node = current_node.right
+					current_node = current_node.get_right()
 			current_node.set_key(key)
 			current_node.set_value(val)
 			current_node.set_size(1)
@@ -267,6 +281,7 @@ class AVLTree(object):
 			current_node.set_BF(0)
 			current_node.set_left(AVLNode.create_virtual_node())
 			current_node.set_right(AVLNode.create_virtual_node())
+			return balance_after_insertion(current_node)
 
 
 
@@ -279,7 +294,26 @@ class AVLTree(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def delete(self, node):
-		return -1
+		current_node = self.root
+		while current_node.key != node.key:
+			if current_node.key > node.key:
+				current_node = current_node.get_left()
+			else:
+				current_node = current_node.right
+		if not current_node.get_right().is_real_node() or not current_node.get_left().is_real_node():
+			parent = current_node.get_parent()
+			current_node.right.set_parent(parent)
+			current_node.left.set_parent(parent)
+			parent.set_right(current_node.right)
+			parent.set_left(current_node.left)
+		else:
+			successor = current_node.find_successor()
+			current_node.set_key(successor.get_key())
+			successor.get_right().set_parent(successor.get_parent())
+			successor.get_parent().set_left(successor.get_right())
+		return balance_after_delete(current_node)
+
+
 
 
 	"""returns an array representing dictionary 
@@ -340,7 +374,16 @@ class AVLTree(object):
 	@returns: the rank of node in self
 	"""
 	def rank(self, node):
-		return None
+		rank = 0
+		current_node = self.root
+		while current_node.get_key() != node.get_key():
+			if current_node.get_key() > node.get_key():
+				current_node = current_node.get_left()
+			else:
+				rank += current_node.get_left().get_size +1
+				current_node = current_node.get_right()
+		rank += current_node.get_left().get_size()
+		return rank
 
 
 	"""finds the i'th smallest item (according to keys) in self
