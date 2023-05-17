@@ -321,6 +321,36 @@ class AVLTree(object):
 
 
 
+
+
+
+
+	def balance_after_insertion(self, node):
+		parent = node.get_parent()
+		while parent is not None:
+			previus_height = parent.get_height()
+			parent.set_height(max(parent.get_left().get_height(), parent.get_right().get_height()) + 1)
+			parent.set_BF(parent.get_right().get_height() - parent.get_left().get_height())
+			if abs(parent.get_BF()) == 2:
+				if parent.get_BF() == 2:
+					if parent.get_left().get_BF() == 1:
+						return roll(parent, R)
+					else:
+						return roll(parent, LR)
+				else:
+					if parent.get_right().get_BF() == 1:
+						return roll(parent, RL)
+					else:
+						return roll(parent, L)
+			if previus_height == parent.get_height:
+				break
+			parent = parent.get_parent()
+
+
+
+
+
+
 	"""returns an array representing dictionary 
 
 	@rtype: list
