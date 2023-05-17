@@ -316,7 +316,7 @@ class AVLTree(object):
 			current_node.set_BF(0)
 			current_node.set_left(AVLNode.create_virtual_node())
 			current_node.set_right(AVLNode.create_virtual_node())
-			return balance_after_insertion(current_node)
+			return self.balance(current_node)
 
 
 	"""Perform a basic roll operation
@@ -391,10 +391,12 @@ class AVLTree(object):
 			parent.set_left(current_node.left)
 		else:
 			successor = current_node.find_successor()
+			successor_parent = successor.get_parent()
 			current_node.set_key(successor.get_key())
-			successor.get_right().set_parent(successor.get_parent())
-			successor.get_parent().set_left(successor.get_right())
-		return balance_after_delete(current_node)
+			successor.get_right().set_parent(successor_parent)
+			successor_parent.set_left(successor.get_right())
+			current_node = successor_parent.get_left()
+		return self.balance(current_node, True)
 
 
 
@@ -403,25 +405,25 @@ class AVLTree(object):
 
 
 
-	def balance_after_insertion(self, node):
+	def balance(self, node, is_delete = False):
+		balnce_number = 0
 		parent = node.get_parent()
 		while parent is not None:
 			previus_height = parent.get_height()
 			parent.update()
 			if abs(parent.get_BF()) == 2:
-				if parent.get_BF() == 2:
-					if parent.get_left().get_BF() == 1:
-						return roll(parent, R)
-					else:
-						return roll(parent, LR)
-				else:
-					if parent.get_right().get_BF() == 1:
-						return roll(parent, RL)
-					else:
-						return roll(parent, L)
+				if not is_delete:
+					return AVLTree.roll(parent, AVLTree.calcNeededRoll(parent))
+				balnce_number += AVLTree.roll(parent, AVLTree.calcNeededRoll(parent))
 			if previus_height == parent.get_height:
 				break
-		pass
+		return balnce_number
+
+
+
+
+
+
 
 
 
