@@ -123,7 +123,11 @@ class AVLNode(object):
 	"""
 	def set_left(self, node : AVLNode):
 		self.left = node
+		node.set_parent(self)
 		return None
+
+	def is_right_child (self):
+		return self.get_parent().get_right() == self
 
 
 	"""sets right child
@@ -133,6 +137,7 @@ class AVLNode(object):
 	"""
 	def set_right(self, node : AVLNode):
 		self.right = node
+		node.set_parent(self)
 		return None
 
 
@@ -315,13 +320,44 @@ class AVLTree(object):
 	A->((B->(C)) becomes B->(C, A)
 	Returns the new root node of the subtree
 	"""
+	@staticmethod
 	def roll (node: AVLNode, direction: int):
+		rootParent = node.get_parent()
+		isRightChild = node.is_right_child()
 		leftChild = node.get_left()
-		rightChild = node.get_right()
+		rightChild = node.get_left()
 		if direction == R: #right roll.
 			leftRightChild = leftChild.get_left()
 			node.set_left(leftRightChild)
+			node.update()
 			leftChild.set_right(node)
+			leftChild.update()
+			if isRightChild:
+				rootParent.set_right(leftChild)
+			else:
+				rootParent.set_left(leftChild)
+			rootParent.update()
+			return 1
+		elif direction == L: #left roll.
+			rightLeftChild = rightChild.get_left()
+			node.set_right(rightLeftChild)
+			node.update()
+			rightChild.set_left(node)
+			rightChild.update()
+			if isRightChild:
+				rootParent.set_right(rightChild)
+			else:
+				rootParent.set_right(rightChild)
+		elif direction == RL:
+			AVLTree.roll(node.right, R)
+			AVLTree.roll(node, L)
+			return 2
+		else:
+			AVLTree.roll(node.left, L)
+			AVLTree.roll(node, R)
+			return 2
+		rootParent.update()
+		return 1
 
 
 
