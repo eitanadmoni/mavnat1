@@ -325,14 +325,14 @@ class AVLTree(object):
 		realGetLeft = AVLNode.get_left
 		realGetRight = AVLNode.get_right
 		realSetLeft = AVLNode.set_left
-		realSetRight = AVLNode.et_right
+		realSetRight = AVLNode.set_right
 		if is_left_roll:
 			realGetLeft = AVLNode.get_right
 			realGetRight = AVLNode.get_left
 			realSetLeft = AVLNode.get_right
 			realSetRight = AVLNode.get_left
 		leftChild = realGetLeft(node)
-		leftRightChild = realGetRight(node, leftChild)
+		leftRightChild = realGetRight(leftChild)
 		realSetRight(node, leftRightChild)
 		node.update()
 		realSetRight(leftChild, node)
@@ -499,7 +499,7 @@ class AVLTree(object):
 			if current_node.get_key() > node.get_key():
 				current_node = current_node.get_left()
 			else:
-				rank += current_node.get_left().get_size +1
+				rank += current_node.get_left().get_size() +1
 				current_node = current_node.get_right()
 		rank += current_node.get_left().get_size()
 		return rank
@@ -514,8 +514,15 @@ class AVLTree(object):
 	@returns: the item of rank i in self
 	"""
 	def select(self, i):
-		return None
-
+		rank = 0
+		current_node = self.root
+		while current_node.get_left().get_size() + rank != i:
+			if current_node.get_left().get_size() < i:
+				current_node = current_node.get_left()
+			else:
+				rank += current_node.get_left().get_size() +1
+				current_node = current_node.get_right()
+		return current_node
 
 	"""returns the root of the tree representing the dictionary
 
