@@ -258,6 +258,7 @@ class AVLTree(object):
 	"""
 	def __init__(self):
 		self.root = AVLNode(None, None)
+		self.min = self.root
 		# add your fields here
 
 
@@ -317,6 +318,8 @@ class AVLTree(object):
 			current_node.set_BF(0)
 			current_node.set_left(AVLNode.create_virtual_node())
 			current_node.set_right(AVLNode.create_virtual_node())
+			if self.min.get_key() > current_node.get_key():
+				self.min = current_node
 			return self.balance(current_node)
 
 	@staticmethod
@@ -441,8 +444,12 @@ class AVLTree(object):
 	@returns: a sorted list according to key of touples (key, value) representing the data structure
 	"""
 	def avl_to_array(self):
-		return None
-
+		sorted_lst = []
+		current_node = self.min
+		for i in range(self.root.get_size()):
+			sorted_lst += (current_node.get_key(), current_node.get_value())
+			current_node = current_node.find_successor()
+		return sorted_lst
 
 	"""returns the number of items in dictionary 
 
