@@ -97,6 +97,27 @@ class AVLNode(object):
     def get_BF(self) -> int:
         return self.BF
 
+    def get_right_should_reverse (self, should_reverse=False):
+        if should_reverse:
+            return self.get_left()
+        return self.get_right()
+
+    def get_left_should_reverse (self, should_reverse=False):
+        if should_reverse:
+            return self.get_right()
+        return self.get_left()
+
+    def set_right_should_reverse (self, node, should_reverse=False):
+        if should_reverse:
+            self.set_left(node)
+        else:
+            self.set_right(node)
+    def set_left_should_reverse (self, node, should_reverse=False):
+        if should_reverse:
+            self.set_right(node)
+        else:
+            self.set_left(node)
+
     """sets key
 
     @type key: int or None
@@ -127,9 +148,6 @@ class AVLNode(object):
         self.left = node
         node.set_parent(self)
         return None
-
-    def is_right_child(self):
-        return self.get_parent().get_right() == self
 
     """sets right child
 
@@ -213,7 +231,7 @@ class AVLNode(object):
         return True
 
 
-    def is_right_son(self):
+    def is_right_child(self):
         return self.get_parent().get_right() == self
 
 
@@ -329,21 +347,11 @@ class AVLTree(object):
 
     @staticmethod
     def basic_roll(node: AVLNode, is_left_roll=False):
-        rootParent = node.get_parent()
-        realGetLeft = AVLNode.get_left
-        realGetRight = AVLNode.get_right
-        realSetLeft = AVLNode.set_left
-        realSetRight = AVLNode.set_right
-        if is_left_roll:
-            realGetLeft = AVLNode.get_right
-            realGetRight = AVLNode.get_left
-            realSetLeft = AVLNode.get_right
-            realSetRight = AVLNode.get_left
-        leftChild = realGetLeft(node)
-        leftRightChild = realGetRight(leftChild)
-        realSetRight(node, leftRightChild)
+        leftChild = node.get_left_should_reverse(is_left_roll)
+        leftRightChild = leftChild.get_right_should_reverse(is_left_roll)
+        node.set_right_should_reverse(leftRightChild, is_left_roll)
         node.update()
-        realSetRight(leftChild, node)
+        leftChild.set_right_should_reverse(leftChild, is_left_roll)
         leftChild.update()
         if node.is_right_child():
             rootParent.set_right(leftChild)
@@ -391,24 +399,29 @@ class AVLTree(object):
     """
 
     def delete(self, node : AVLNode):
-        current_node = node
-        parent = current_node.get_parent()
-        if current_node.get_right().is_real_node() and current_node.get_left().is_real_node():
-            successor = current_node.find_successor()
-            parent = successor.get_parent()
-            current_node.set_key(successor.get_key())
-            successor.get_right().set_parent(parent)
-            parent.set_left(successor.get_right())
-            current_node = parent.get_left()
-        else:
-            if current_node.get_right().is_real_node():
-                current_node.get_right().set_parent(parent)
-                parent.set_right(current_node.get_right()) if current_node.is_right_son() else parent.set_left(current_node.get_right())
+        parent = node.get_parent()
+        toBalance = parent
+        if node.get_right().is_real_node() and node.get_left().is_real_node():
+            successor = node.find_successor()
+            newKey, newValue = successor.get_key(), successor.get_value()
+            succParent = successor.get_parent()
+            if successor.is_right_child():
+                succParent.set_right(AVLNode.create_virtual_node())
             else:
-                current_node.get_left().set_parent(parent)
-                parent.set_right(current_node.get_left()) if current_node.is_right_son() else parent.set_left(
-                    current_node.get_left())
-        return self.balance(current_node, True)
+                succParent.set_left(AVLNode.create_virtual_node())
+            node.set_key(key)
+            node.set_value(value)
+            toBalance = succParent
+        else:
+            newNode = node.get_right()
+            if not newNode.is_real_node():
+                newNode = node.get_left()
+            if node.is_right_child():
+                node.get_parent().set_right(newNode)
+            else:
+                node.get_parent().set_left(newNode)
+            parent.update()
+        return self.balance(toBalance, True)
 
     def balance(self, node, is_delete=False):
         balance_number = 0
