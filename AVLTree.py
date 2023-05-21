@@ -128,9 +128,6 @@ class AVLNode(object):
         node.set_parent(self)
         return None
 
-    def is_right_child(self):
-        return self.get_parent().get_right() == self
-
     """sets right child
 
     @type node: AVLNode
@@ -213,7 +210,7 @@ class AVLNode(object):
         return True
 
 
-    def is_right_son(self):
+    def is_right_child(self):
         return self.get_parent().get_right() == self
 
 
@@ -390,24 +387,29 @@ class AVLTree(object):
     """
 
     def delete(self, node : AVLNode):
-        current_node = node
-        parent = current_node.get_parent()
-        if current_node.get_right().is_real_node() and current_node.get_left().is_real_node():
-            successor = current_node.find_successor()
-            parent = successor.get_parent()
-            current_node.set_key(successor.get_key())
-            successor.get_right().set_parent(parent)
-            parent.set_left(successor.get_right())
-            current_node = parent.get_left()
-        else:
-            if current_node.get_right().is_real_node():
-                current_node.get_right().set_parent(parent)
-                parent.set_right(current_node.get_right()) if current_node.is_right_son() else parent.set_left(current_node.get_right())
+        parent = node.get_parent()
+        toBalance = parent
+        if node.get_right().is_real_node() and node.get_left().is_real_node():
+            successor = node.find_successor()
+            newKey, newValue = successor.get_key(), successor.get_value()
+            succParent = successor.get_parent()
+            if successor.is_right_child():
+                succParent.set_right(AVLNode.create_virtual_node())
             else:
-                current_node.get_left().set_parent(parent)
-                parent.set_right(current_node.get_left()) if current_node.is_right_son() else parent.set_left(
-                    current_node.get_left())
-        return self.balance(current_node, True)
+                succParent.set_left(AVLNode.create_virtual_node())
+            node.set_key(key)
+            node.set_value(value)
+            toBalance = succParent
+        else:
+            newNode = node.get_right()
+            if not newNode.is_real_node():
+                newNode = node.get_left()
+            if node.is_right_child():
+                node.get_parent().set_right(newNode)
+            else:
+                node.get_parent().set_left(newNode)
+            parent.update()
+        return self.balance(toBalance, True)
 
     def balance(self, node, is_delete=False):
         balance_number = 0
