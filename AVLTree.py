@@ -186,7 +186,7 @@ class AVLNode(object):
             self.set_size(self.get_left().get_size() + self.get_right().get_size())
 
     def update_height(self):
-        self.set_size(max(self.get_right().get_size(), self.get_left().get_size()) + 1)
+        self.set_height(max(self.get_right().get_height(), self.get_left().get_height()) + 1)
 
     def update_BF(self):
         self.set_BF(self.get_left().get_height() - self.get_right().get_height())
@@ -310,13 +310,14 @@ class AVLTree(object):
             node.set_left(AVLNode.create_virtual_node())
             node.update()
             self.set_root(node)
+            self.min = self.get_root()
             return 0
         current_node = self.get_root()
         while current_node.is_real_node():
             if current_node.get_key() > key:
-                current_node = current_node.get_right()
-            else:
                 current_node = current_node.get_left()
+            else:
+                current_node = current_node.get_right()
         current_node.set_key(key)
         current_node.set_value(val)
         current_node.set_left(AVLNode.create_virtual_node())
@@ -421,6 +422,7 @@ class AVLTree(object):
                 balance_number += AVLTree.roll(parent, AVLTree.calcNeededRoll(parent))
             if previus_height == parent.get_height:
                 break
+            parent = parent.get_parent()
         return balance_number
 
     """returns an array representing dictionary 
@@ -529,3 +531,4 @@ class AVLTree(object):
 
     def set_root(self, node):
         self.root.set_right(node)
+
