@@ -97,6 +97,27 @@ class AVLNode(object):
     def get_BF(self) -> int:
         return self.BF
 
+    def get_right_should_reverse (self, should_reverse=False):
+        if should_reverse:
+            return self.get_left()
+        return self.get_right()
+
+    def get_left_should_reverse (self, should_reverse=False):
+        if should_reverse:
+            return self.get_right()
+        return self.get_left()
+
+    def set_right_should_reverse (self, node, should_reverse=False):
+        if should_reverse:
+            self.set_left(node)
+        else:
+            self.set_right(node)
+    def set_left_should_reverse (self, node, should_reverse=False):
+        if should_reverse:
+            self.set_right(node)
+        else:
+            self.set_left(node)
+
     """sets key
 
     @type key: int or None
@@ -325,21 +346,11 @@ class AVLTree(object):
 
     @staticmethod
     def basic_roll(node: AVLNode, is_left_roll=False):
-        rootParent = node.get_parent()
-        realGetLeft = AVLNode.get_left
-        realGetRight = AVLNode.get_right
-        realSetLeft = AVLNode.set_left
-        realSetRight = AVLNode.set_right
-        if is_left_roll:
-            realGetLeft = AVLNode.get_right
-            realGetRight = AVLNode.get_left
-            realSetLeft = AVLNode.get_right
-            realSetRight = AVLNode.get_left
-        leftChild = realGetLeft(node)
-        leftRightChild = realGetRight(leftChild)
-        realSetRight(node, leftRightChild)
+        leftChild = node.get_left_should_reverse(is_left_roll)
+        leftRightChild = leftChild.get_right_should_reverse(is_left_roll)
+        node.set_right_should_reverse(leftRightChild, is_left_roll)
         node.update()
-        realSetRight(leftChild, node)
+        leftChild.set_right_should_reverse(leftChild, is_left_roll)
         leftChild.update()
         if node.is_right_child():
             rootParent.set_right(leftChild)
