@@ -347,6 +347,7 @@ class AVLTree(object):
 
     @staticmethod
     def basic_roll(node: AVLNode, is_left_roll=False):
+        rootParent = node.get_parent()
         leftChild = node.get_left_should_reverse(is_left_roll)
         leftRightChild = leftChild.get_right_should_reverse(is_left_roll)
         node.set_right_should_reverse(leftRightChild, is_left_roll)
@@ -405,12 +406,9 @@ class AVLTree(object):
             successor = node.find_successor()
             newKey, newValue = successor.get_key(), successor.get_value()
             succParent = successor.get_parent()
-            if successor.is_right_child():
-                succParent.set_right(AVLNode.create_virtual_node())
-            else:
-                succParent.set_left(AVLNode.create_virtual_node())
-            node.set_key(key)
-            node.set_value(value)
+            succParent.set_left(AVLNode.create_virtual_node())  # successor is always a left son
+            node.set_key(newKey)
+            node.set_value(newValue)
             toBalance = succParent
         else:
             newNode = node.get_right()
@@ -433,8 +431,10 @@ class AVLTree(object):
                 if not is_delete:
                     return AVLTree.roll(parent, AVLTree.calcNeededRoll(parent))
                 balance_number += AVLTree.roll(parent, AVLTree.calcNeededRoll(parent))
-            if previus_height == parent.get_height:
+            elif previus_height == parent.get_height:
                 break
+            else:
+                balance_number += 1
             parent = parent.get_parent()
         return balance_number
 
@@ -490,7 +490,7 @@ class AVLTree(object):
     """
 
     def join(self, tree, key, val):
-        return None
+       return None
 
     """compute the rank of node in the self
 
@@ -544,4 +544,5 @@ class AVLTree(object):
 
     def set_root(self, node):
         self.root.set_right(node)
+
 
