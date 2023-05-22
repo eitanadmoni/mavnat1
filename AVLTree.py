@@ -406,7 +406,7 @@ class AVLTree(object):
 
     def delete(self, node : AVLNode):
         print ("Deleting", node.get_key())
-        if not node.get_parent().is_real_node():
+        if self.get_root().get_size() == 1:
             self.get_root().get_parent().set_right(AVLNode.create_virtual_node())
             self.set_min(self.get_root())
             return 0
@@ -425,6 +425,12 @@ class AVLTree(object):
             node.set_value(newValue)
             toBalance = succParent
         else:
+            if node.get_key() == self.get_root().get_key():
+                if self.get_root().get_left().is_real_node():
+                    self.set_root(self.get_root().get_left())
+                else:
+                    self.set_root(self.get_root().get_right())
+                return 0
             newNode = node.get_right()
             if not newNode.is_real_node():
                 newNode = node.get_left()
