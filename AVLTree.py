@@ -406,6 +406,10 @@ class AVLTree(object):
 
     def delete(self, node : AVLNode):
         print ("Deleting", node.get_key())
+        if not node.get_parent().is_real_node():
+            self.get_root().get_parent().set_right(AVLNode.create_virtual_node())
+            self.set_min(self.get_root())
+            return 0
         parent = node.get_parent()
         toBalance = parent
         if node.get_right().is_real_node() and node.get_left().is_real_node():
@@ -589,7 +593,7 @@ class AVLTree(object):
 
     def rank(self, node):
         rank = 0
-        current_node = self.root
+        current_node = self.get_root()
         while current_node.get_key() != node.get_key():
             if current_node.get_key() > node.get_key():
                 current_node = current_node.get_left()
@@ -597,7 +601,7 @@ class AVLTree(object):
                 rank += current_node.get_left().get_size() + 1
                 current_node = current_node.get_right()
         rank += current_node.get_left().get_size()
-        return rank
+        return rank + 1
 
     """finds the i'th smallest item (according to keys) in self
 
@@ -610,9 +614,9 @@ class AVLTree(object):
 
     def select(self, i):
         rank = 0
-        current_node = self.root
-        while current_node.get_left().get_size() + rank != i:
-            if current_node.get_left().get_size() < i:
+        current_node = self.get_root()
+        while current_node.get_left().get_size() + 1 + rank != i:
+            if current_node.get_left().get_size() + 1 + rank > i:
                 current_node = current_node.get_left()
             else:
                 rank += current_node.get_left().get_size() + 1
