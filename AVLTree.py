@@ -287,7 +287,7 @@ class AVLTree(object):
     def __init__(self):
         self.root = AVLNode.create_virtual_node()
         self.root.set_right(AVLNode.create_virtual_node())
-        self.min = self.root
+
 
     # add your fields here
 
@@ -323,15 +323,12 @@ class AVLTree(object):
     """
 
     def insert(self, key, val):
-        print ("Inserting ", key, ", ", val)
         if not self.get_root().is_real_node():
-            print ("Empty tree - tree becomes root")
             node = AVLNode(key, val)
             node.set_right(AVLNode.create_virtual_node())
             node.set_left(AVLNode.create_virtual_node())
             node.update()
             self.set_root(node)
-            self.min = self.get_root()
             return 0
         current_node = self.get_root()
         while current_node.is_real_node():
@@ -339,14 +336,11 @@ class AVLTree(object):
                 current_node = current_node.get_left()
             else:
                 current_node = current_node.get_right()
-        print ("Adding as the child of ", current_node.get_parent().get_key())
         current_node.set_key(key)
         current_node.set_value(val)
         current_node.set_left(AVLNode.create_virtual_node())
         current_node.set_right(AVLNode.create_virtual_node())
         current_node.update()
-        if self.min.get_key() > current_node.get_key():
-            self.min = current_node
         return self.balance(current_node)
 
     def basic_roll(self, node: AVLNode, is_left_roll=False):
@@ -373,7 +367,6 @@ class AVLTree(object):
     """
 
     def roll(self, node: AVLNode, direction: int):
-        print ("Rolling ",  node.get_key(), ": ",  direction_text[direction])
         if direction in (R, L):
             left_roll = direction == L
             self.basic_roll(node, is_left_roll=left_roll)
@@ -405,18 +398,13 @@ class AVLTree(object):
     """
 
     def delete(self, node : AVLNode):
-        print ("Deleting", node.get_key())
         if self.get_root().get_size() == 1:
             self.get_root().get_parent().set_right(AVLNode.create_virtual_node())
-            self.set_min(self.get_root())
             return 0
-        if self.get_min().get_key() == node.get_key():
-            self.set_min(self.get_min().find_successor())
         parent = node.get_parent()
         toBalance = parent
         if node.get_right().is_real_node() and node.get_left().is_real_node():
             successor = node.find_successor()
-            print ("Successor", successor.get_key(), "fills in")
             newKey, newValue = successor.get_key(), successor.get_value()
             succParent = successor.get_parent()
             if successor.is_right_child():
@@ -470,7 +458,10 @@ class AVLTree(object):
 
     def avl_to_array(self):
         sorted_lst = []
-        current_node = self.get_min()
+        current_node = self.get_root()
+        while current_node.is_real_node():
+            current_node = current_node.get_left()
+        current_node = current_node.get_parent()
         for i in range(self.get_root().get_size()):
             sorted_lst.append((current_node.get_key(), current_node.get_value()))
             current_node = current_node.find_successor()
@@ -569,7 +560,6 @@ class AVLTree(object):
             insertion_place.set_parent(node_to_insert)
             tree.get_root().set_parent(node_to_insert)
             tree.set_root(self.get_root())
-            tree.set_min(self.get_min())
             if equals:
                 self.set_root(node_to_insert)
                 tree.set_root(node_to_insert)
@@ -582,7 +572,6 @@ class AVLTree(object):
             insertion_place.set_parent(node_to_insert)
             self.get_root().set_parent(node_to_insert)
             self.set_root(tree.get_root())
-            tree.set_min(self.get_min)
             node_to_insert.update()
             if node_to_insert.get_parent().is_real_node():
                 self.balance(node_to_insert, True)
@@ -645,11 +634,6 @@ class AVLTree(object):
     def set_root(self, node):
         self.root.set_right(node)
 
-    def get_min(self):
-        return self.min
-
-    def set_min(self, node):
-        self.min = node
 
     def display(self, root):
         lines, *_ = self._display_aux(root)
