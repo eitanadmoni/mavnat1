@@ -410,6 +410,8 @@ class AVLTree(object):
             self.get_root().get_parent().set_right(AVLNode.create_virtual_node())
             self.set_min(self.get_root())
             return 0
+        if self.get_min().get_key() == node.get_key():
+            self.set_min(self.get_min().find_successor())
         parent = node.get_parent()
         toBalance = parent
         if node.get_right().is_real_node() and node.get_left().is_real_node():
@@ -418,12 +420,14 @@ class AVLTree(object):
             newKey, newValue = successor.get_key(), successor.get_value()
             succParent = successor.get_parent()
             if successor.is_right_child():
-                succParent.set_right(AVLNode.create_virtual_node())
+                succParent.set_right(successor.get_right())
+                successor.get_right().set_parent(succParent)
             else:
-                succParent.set_left(AVLNode.create_virtual_node())
+                succParent.set_left(successor.get_right())
+                successor.get_right().set_parent(succParent)
             node.set_key(newKey)
             node.set_value(newValue)
-            toBalance = succParent
+            toBalance = succParent.get_right()
         else:
             if node.get_key() == self.get_root().get_key():
                 if self.get_root().get_left().is_real_node():
