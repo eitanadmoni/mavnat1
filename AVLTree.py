@@ -415,7 +415,7 @@ class AVLTree(object):
                 successor.get_right().set_parent(succParent)
             node.set_key(newKey)
             node.set_value(newValue)
-            toBalance = succParent.get_right()
+            toBalance = succParent
         else:
             if node.get_key() == self.get_root().get_key():
                 if self.get_root().get_left().is_real_node():
@@ -431,7 +431,7 @@ class AVLTree(object):
             else:
                 node.get_parent().set_left(newNode)
             parent.update()
-        return self.balance(toBalance, True)
+        return self.balance(toBalance.get_right(), True)
 
     def balance(self, node, is_delete=False):
         balance_number = 0
