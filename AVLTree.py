@@ -434,7 +434,7 @@ class AVLTree(object):
     def balance(self, node, is_delete=False):
         balance_number = 0
         parent = node.get_parent()
-        while parent != self.root:
+        while parent.get_key() != self.root.get_key():
             previus_height = parent.get_height()
             parent.update()
             if abs(parent.get_BF()) == 2:
@@ -516,7 +516,6 @@ class AVLTree(object):
     @rtype: int
     @returns: the absolute value of the difference between the height of the AVL trees joined +1
     """
-
     def join(self, tree: AVLTree, key, val):
         if not self.get_root().is_real_node():
             tree.insert(key, val)
@@ -525,6 +524,12 @@ class AVLTree(object):
         elif not tree.get_root().is_real_node():
             self.insert(key, val)
             return 1
+        if self.get_root().get_key() > key:
+            return tree.real_join(self, key, val)
+        else:
+            return self.real_join(tree, key, val)
+
+    def real_join(self, tree: AVLTree, key, val):
         cost = self.get_root().get_height() + tree.get_root().get_height() + 1
         node_to_insert = AVLNode(key, val)
         if self.get_root().get_height() > tree.get_root().get_height():
@@ -549,8 +554,11 @@ class AVLTree(object):
             node_to_insert.set_left(insertion_place)
             insertion_place.set_parent(node_to_insert)
             tree.get_root().set_parent(node_to_insert)
+            tree.set_root(self.get_root())
+            tree.set_min(self.get_min())
             if equals:
                 self.set_root(node_to_insert)
+                tree.set_root(node_to_insert)
             node_to_insert.update()
             self.balance(node_to_insert, True)
         else:
@@ -682,3 +690,4 @@ class AVLTree(object):
         zipped_lines = zip(left, right)
         lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
         return lines, n + m + u, max(p, q) + 2, n + u // 2
+
