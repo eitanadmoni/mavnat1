@@ -489,8 +489,48 @@ class AVLTree(object):
     @returns: the absolute value of the difference between the height of the AVL trees joined +1
     """
 
-    def join(self, tree, key, val):
-       return None
+    def join(self, tree: AVLTree, key, val):
+        cost = self.get_root().get_height() + tree.get_root().get_height() + 1
+        node_to_insert = AVLNode(key, val)
+        if self.get_root().get_height() > tree.get_root().get_height():
+            insertion_place = self.get_root()
+            while insertion_place.get_height() > tree.get_root().get_height():
+                insertion_place = insertion_place.get_right()
+            self.connect_trees(tree, node_to_insert, insertion_place, True)
+
+        else:
+            insertion_place = tree.get_root()
+            while insertion_place.get_height() > self.get_root().get_height():
+                insertion_place = insertion_place.get_left()
+            self.connect_trees(tree, node_to_insert, insertion_place, False)
+        return cost
+
+    def connect_trees(self, tree: AVLTree, node_to_insert, insertion_place, self_height_bigger):
+        if self_height_bigger:
+            insertion_place.get_parent().set_right(node_to_insert)
+            node_to_insert.set_right(tree.get_root())
+            node_to_insert.set_left(insertion_place)
+            insertion_place.set_parent(node_to_insert)
+            tree.get_root().set_parent(node_to_insert)
+            tree.set_root(self.get_root())
+            tree.set_min(self.get_min)
+            node_to_insert.update()
+            self.balance(node_to_insert, True)
+        else:
+            insertion_place.get_parent().set_left(node_to_insert)
+            node_to_insert.set_right(insertion_place)
+            node_to_insert.set_left(self.get_root())
+            insertion_place.set_parent(node_to_insert)
+            self.get_root().set_parent(node_to_insert)
+            self.set_root(tree.get_root())
+            tree.set_min(self.get_min)
+            node_to_insert.update()
+            self.balance(node_to_insert, True)
+
+
+
+
+
 
     """compute the rank of node in the self
 
@@ -545,4 +585,9 @@ class AVLTree(object):
     def set_root(self, node):
         self.root.set_right(node)
 
+    def get_min(self):
+        return self.min
+
+    def set_min(self, node):
+        self.min = node
 
