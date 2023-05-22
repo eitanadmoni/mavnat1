@@ -458,7 +458,7 @@ class AVLTree(object):
         sorted_lst = []
         current_node = self.get_min()
         for i in range(self.get_root().get_size()):
-            sorted_lst += (current_node.get_key(), current_node.get_value())
+            sorted_lst.append((current_node.get_key(), current_node.get_value()))
             current_node = current_node.find_successor()
         return sorted_lst
 
@@ -500,6 +500,13 @@ class AVLTree(object):
     """
 
     def join(self, tree: AVLTree, key, val):
+        if not self.get_root().is_real_node():
+            tree.insert(key, val)
+            self.set_root(tree.get_root())
+            return 1
+        elif not tree.get_root().is_real_node():
+            self.insert(key, val)
+            return 1
         cost = self.get_root().get_height() + tree.get_root().get_height() + 1
         node_to_insert = AVLNode(key, val)
         if self.get_root().get_height() > tree.get_root().get_height():
@@ -657,23 +664,3 @@ class AVLTree(object):
         zipped_lines = zip(left, right)
         lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
         return lines, n + m + u, max(p, q) + 2, n + u // 2
-
-if __name__ == '__main__':
-    t = AVLTree()
-    t.insert(1,1)
-    t.insert(2,2)
-    t2 = AVLTree()
-    t2.insert(4,4)
-    t2.insert(5,5)
-    t2.insert(6,6)
-    t2.insert(7,7)
-    t2.insert(8,8)
-    t2.insert(9,9)
-    t2.insert(10,10)
-    t2.insert(11,11)
-    t2.insert(12,12)
-    t2.insert(13,13)
-    t2.insert(14,14)
-    t.join(t2, 3, 11)
-    print(t.get_min().get_key())
-    print(t.avl_to_array())
