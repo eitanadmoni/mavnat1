@@ -601,3 +601,4 @@ class AVLTree(object):
     def set_min(self, node):
         self.min = node
 
+pass
