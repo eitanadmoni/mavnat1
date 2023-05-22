@@ -506,24 +506,26 @@ class AVLTree(object):
             insertion_place = self.get_root()
             while insertion_place.get_height() > tree.get_root().get_height():
                 insertion_place = insertion_place.get_right()
-            self.connect_trees(tree, node_to_insert, insertion_place, True)
-
+            self.connect_trees(tree, node_to_insert, insertion_place, False)
+        elif self.get_root().get_height() == tree.get_root().get_height():
+            insertion_place = self.get_root()
+            self.connect_trees(tree, node_to_insert, insertion_place, False, True)
         else:
             insertion_place = tree.get_root()
             while insertion_place.get_height() > self.get_root().get_height():
                 insertion_place = insertion_place.get_left()
-            self.connect_trees(tree, node_to_insert, insertion_place, False)
+            self.connect_trees(tree, node_to_insert, insertion_place, True)
         return cost
 
-    def connect_trees(self, tree: AVLTree, node_to_insert, insertion_place, self_height_bigger):
-        if self_height_bigger:
+    def connect_trees(self, tree: AVLTree, node_to_insert, insertion_place, self_height_lower, equals = False):
+        if not self_height_lower:
             insertion_place.get_parent().set_right(node_to_insert)
             node_to_insert.set_right(tree.get_root())
             node_to_insert.set_left(insertion_place)
             insertion_place.set_parent(node_to_insert)
             tree.get_root().set_parent(node_to_insert)
-            tree.set_root(self.get_root())
-            tree.set_min(self.get_min)
+            if equals:
+                self.set_root(node_to_insert)
             node_to_insert.update()
             self.balance(node_to_insert, True)
         else:
@@ -535,7 +537,8 @@ class AVLTree(object):
             self.set_root(tree.get_root())
             tree.set_min(self.get_min)
             node_to_insert.update()
-            self.balance(node_to_insert, True)
+            if node_to_insert.get_parent().is_real_node():
+                self.balance(node_to_insert, True)
 
 
 
@@ -601,4 +604,57 @@ class AVLTree(object):
     def set_min(self, node):
         self.min = node
 
-pass
+    def display(self, root):
+        lines, *_ = self._display_aux(root)
+        for line in lines:
+            print(line)
+
+    def _display_aux(self, node):
+        """Returns list of strings, width, height, and horizontal coordinate of the root."""
+        # No child.
+        if not node.get_right() and not node.get_left():
+            if not node.is_real_node():
+                line = '%s' % "V"
+            else:
+                line = '%s' % node.get_key()
+
+            width = len(line)
+            height = 1
+            middle = width // 2
+            return [line], width, height, middle
+
+        # Only left child.
+        if not node.get_right() and node.get_left():
+            lines, n, p, x = self._display_aux(node.get_left())
+            s = '%s' % node.get_key()
+            u = len(s)
+            first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s
+            second_line = x * ' ' + '/' + (n - x - 1 + u) * ' '
+            shifted_lines = [line + u * ' ' for line in lines]
+            return [first_line, second_line] + shifted_lines, n + u, p + 2, n + u // 2
+
+        # Only right child.
+        if not node.get_left() and node.get_right():
+            lines, n, p, x = self._display_aux(node.get_right())
+            s = '%s' % node.get_key()
+            u = len(s)
+            first_line = s + x * '_' + (n - x) * ' '
+            second_line = (u + x) * ' ' + '\\' + (n - x - 1) * ' '
+            shifted_lines = [u * ' ' + line for line in lines]
+            return [first_line, second_line] + shifted_lines, n + u, p + 2, u // 2
+
+        # Two children.
+        left, n, p, x = self._display_aux(node.get_left())
+        right, m, q, y = self._display_aux(node.get_right())
+        s = '%s' % node.get_key()
+        u = len(s)
+        first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s + y * '_' + (m - y) * ' '
+        second_line = x * ' ' + '/' + (n - x - 1 + u + y) * ' ' + '\\' + (m - y - 1) * ' '
+        if p < q:
+            left += [n * ' '] * (q - p)
+        elif q < p:
+            right += [m * ' '] * (p - q)
+        zipped_lines = zip(left, right)
+        lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
+        return lines, n + m + u, max(p, q) + 2, n + u // 2
+
