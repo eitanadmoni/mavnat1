@@ -482,9 +482,27 @@ class AVLTree(object):
     dictionary larger than node.key.
     """
 
-    def split(self, node):
-        return None
-
+    def split(self, node: AVLNode):
+        TLeft = AVLTree()
+        TLeft.set_root(node.get_left())
+        TRight = AVLTree()
+        TRight.set_root(node.get_right())
+        isRightChild = node.is_right_child()
+        current = node.get_parent()
+        current.set_left_should_reverse(AVLNode.create_virtual_node(), isRightChild)
+        while current != self.root:
+            leftNode = current.get_left() if isRightChild else current.get_right()
+            leftTree = AVLTree()
+            leftTree.set_root(leftNode)
+            if isRightChild:
+                TLeft.join(leftTree, current.get_key(), current.get_value())
+            else:
+                leftTree.join(TRight, current.get_key(), current.get_value())
+                TRight = leftTree
+            isRightChild = current.is_right_child()
+            current = current.get_parent()
+            current.set_left_should_reverse(AVLNode.create_virtual_node(), isRightChild)
+        return [TLeft, TRight]
     """joins self with key and another AVLTree
 
     @type tree: AVLTree 
