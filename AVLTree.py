@@ -490,7 +490,7 @@ class AVLTree(object):
         isRightChild = node.is_right_child()
         current = node.get_parent()
         current.set_left_should_reverse(AVLNode.create_virtual_node(), isRightChild)
-        while current != self.root:
+        while current.get_key() != self.root.get_key():
             leftNode = current.get_left() if isRightChild else current.get_right()
             leftTree = AVLTree()
             leftTree.set_root(leftNode)
