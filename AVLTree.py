@@ -356,7 +356,7 @@ class AVLTree(object):
             rootParent.set_right(leftChild)
         else:
             rootParent.set_left(leftChild)
-        if rootParent != self.root:
+        if rootParent == self.root:
             rootParent.update()
 
     """Perform a basic roll operation
@@ -440,11 +440,9 @@ class AVLTree(object):
             previus_height = parent.get_height()
             parent.update()
             if abs(parent.get_BF()) == 2:
-                if not is_delete:
-                    return self.roll(parent, AVLTree.calcNeededRoll(parent))
                 balance_number += self.roll(parent, AVLTree.calcNeededRoll(parent))
             elif previus_height == parent.get_height:
-                break
+                continue
             else:
                 balance_number += 1
             parent = parent.get_parent()
