@@ -160,6 +160,9 @@ class AVLNode(object):
         node.set_parent(self)
         return None
 
+    def __repr__(self):
+        return f"AVLNode key: {self.get_key()} height: {self.get_height()} size {self.get_size()}"
+
     """sets parent
 
     @type node: AVLNode
@@ -288,6 +291,9 @@ class AVLTree(object):
         self.root = AVLNode.create_virtual_node()
         self.root.set_right(AVLNode.create_virtual_node())
 
+    def __repr__(self):
+        return f"AVLTree root {self.get_root()}"
+
 
     # add your fields here
 
@@ -372,10 +378,10 @@ class AVLTree(object):
             self.basic_roll(node, is_left_roll=left_roll)
             return 1
         elif direction == RL:
-            self.roll(node.right, R)
+            self.roll(node.get_right(), R)
             self.roll(node, L)
         else:
-            self.roll(node.left, L)
+            self.roll(node.get_left(), L)
             self.roll(node, R)
         return 2
 
@@ -409,10 +415,8 @@ class AVLTree(object):
             succParent = successor.get_parent()
             if successor.is_right_child():
                 succParent.set_right(successor.get_right())
-                successor.get_right().set_parent(succParent)
             else:
                 succParent.set_left(successor.get_right())
-                successor.get_right().set_parent(succParent)
             node.set_key(newKey)
             node.set_value(newValue)
             toBalance = succParent.get_right()
@@ -496,16 +500,15 @@ class AVLTree(object):
         current = node.get_parent()
         current.set_left_should_reverse(AVLNode.create_virtual_node(), isRightChild)
         while current.get_key() != self.root.get_key():
+            nextIsRightChild = current.is_right_child()
+            parent = current.get_parent()
             leftNode = current.get_left() if isRightChild else current.get_right()
             leftTree = AVLTree()
             leftTree.set_root(leftNode)
-            if isRightChild:
-                TLeft.join(leftTree, current.get_key(), current.get_value())
-            else:
-                leftTree.join(TRight, current.get_key(), current.get_value())
-                TRight = leftTree
-            isRightChild = current.is_right_child()
-            current = current.get_parent()
+            (TLeft if isRightChild else TRight)\
+                .join(leftTree, current.get_key(), current.get_value())
+            isRightChild = nextIsRightChild
+            current = parent
             current.set_left_should_reverse(AVLNode.create_virtual_node(), isRightChild)
         return [TLeft, TRight]
     """joins self with key and another AVLTree
@@ -557,8 +560,6 @@ class AVLTree(object):
             insertion_place.get_parent().set_right(node_to_insert)
             node_to_insert.set_right(tree.get_root())
             node_to_insert.set_left(insertion_place)
-            insertion_place.set_parent(node_to_insert)
-            tree.get_root().set_parent(node_to_insert)
             tree.set_root(self.get_root())
             if equals:
                 self.set_root(node_to_insert)
@@ -569,8 +570,6 @@ class AVLTree(object):
             insertion_place.get_parent().set_left(node_to_insert)
             node_to_insert.set_right(insertion_place)
             node_to_insert.set_left(self.get_root())
-            insertion_place.set_parent(node_to_insert)
-            self.get_root().set_parent(node_to_insert)
             self.set_root(tree.get_root())
             node_to_insert.update()
             if node_to_insert.get_parent().is_real_node():
