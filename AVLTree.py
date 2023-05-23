@@ -362,7 +362,7 @@ class AVLTree(object):
             rootParent.set_right(leftChild)
         else:
             rootParent.set_left(leftChild)
-        if rootParent == self.root:
+        if rootParent != self.root:
             rootParent.update()
 
     """Perform a basic roll operation
@@ -531,7 +531,9 @@ class AVLTree(object):
             self.insert(key, val)
             return 1
         if self.get_root().get_key() > key:
-            return tree.real_join(self, key, val)
+            cost = tree.real_join(self, key, val)
+            self.set_root(tree.get_root())
+            return cost
         else:
             return self.real_join(tree, key, val)
 
@@ -553,15 +555,13 @@ class AVLTree(object):
             self.connect_trees(tree, node_to_insert, insertion_place, True)
         return cost
 
-    def connect_trees(self, tree: AVLTree, node_to_insert, insertion_place, self_height_lower, equals = False):
+    def connect_trees(self, tree: AVLTree, node_to_insert, insertion_place, self_height_lower, equals=False):
         if not self_height_lower:
             insertion_place.get_parent().set_right(node_to_insert)
             node_to_insert.set_right(tree.get_root())
             node_to_insert.set_left(insertion_place)
-            tree.set_root(self.get_root())
             if equals:
                 self.set_root(node_to_insert)
-                tree.set_root(node_to_insert)
             node_to_insert.update()
             self.balance(node_to_insert, True)
         else:
