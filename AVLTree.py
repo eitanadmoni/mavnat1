@@ -362,7 +362,7 @@ class AVLTree(object):
             rootParent.set_right(leftChild)
         else:
             rootParent.set_left(leftChild)
-        if rootParent == self.root:
+        if rootParent != self.root:
             rootParent.update()
 
     """Perform a basic roll operation
@@ -686,3 +686,8 @@ class AVLTree(object):
         lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
         return lines, n + m + u, max(p, q) + 2, n + u // 2
 
+if __name__ == '__main__':
+    tree = AVLTree()
+    for i in range(1, 20):
+        tree.insert(i,i)
+    tree.display()
