@@ -5,6 +5,7 @@
 # name2    - Eitan Admoni
 
 from __future__ import annotations
+from random import shuffle
 
 """A class represnting a node in an AVL tree"""
 
@@ -685,6 +686,44 @@ class AVLTree(object):
         zipped_lines = zip(left, right)
         lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
         return lines, n + m + u, max(p, q) + 2, n + u // 2
+
+def arr_to_avl (arr, finger=True):
+    tree = AVLTree()
+    actions = 0
+    for a in arr:
+        actions += tree.insert_finger (a) if finger else tree.insert(a)
+    return tree, actions
+
+def num_switches (arr):
+    count = 0
+    for i in range(len(arr)):
+        for j in range(i+1, len(arr)):
+            if arr[j] < arr[i]:
+                count += 1
+    return count
+
+def q1 ():
+    for i in range(1,6):
+        print (f'#{i}')
+        n = 1500 * (2**i)
+        print ('reverse sorted:')
+        arr = [a for a in range(n, 0, -1)]
+        print ('num switches:', num_switches(arr))
+        tree, cost = arr_to_avl(arr)
+        print ('AVL cost:', cost)
+        print ('')
+        print ('Random sorted:')
+        shuffle(arr)
+        print ('switches: ', num_switches(arr))
+        tree, cost = arr_to_avl(arr)
+        print ('AVL Cost:', cost)
+        print ('Almost sorted:')
+        arr = []
+        for t in range(n / 300):
+            arr += [a for a in range(300*(t+1), 300*t, -1)]
+        print ('switches: ', num_switches(arr))
+        tree, cost = arr_to_avl(arr)
+        print ('AVL Cost:', cost)
 
 if __name__ == '__main__':
     tree = AVLTree()
