@@ -652,7 +652,7 @@ class AVLTree(object):
         current_node = self.get_max()
         while current_node.is_real_node():
             if current_node.get_key() > key:
-                if current_node.get_parent().get_key() < key:
+                if current_node != self.get_root() and current_node.get_parent().get_key() < key:
                     current_node = current_node.get_parent()
                 else:
                     current_node = current_node.get_left()
