@@ -256,7 +256,7 @@ class AVLNode(object):
     @rtype: AVLNode
     """
 
-    def find_successor(self) -> AVLNode | None:
+    def find_successor(self) -> AVLNode | None:  # O(log(n))
         if self.get_right().is_real_node():
             current_node = self.get_right()
             while current_node.is_real_node():
@@ -306,7 +306,7 @@ class AVLTree(object):
     @returns: node corresponding to key.
     """
 
-    def search(self, key):
+    def search(self, key):          # O(log(n))
         crnt_node = self.get_root()  # type: AVLNode
         while crnt_node.is_real_node():
             dif = key - crnt_node.get_key()
@@ -329,7 +329,7 @@ class AVLTree(object):
     @returns: the number of rebalancing operation due to AVL rebalancing
     """
 
-    def insert(self, key, val):
+    def insert(self, key, val):         # O(log(n))
         if not self.get_root().is_real_node():
             node = AVLNode(key, val)
             node.set_right(AVLNode.create_virtual_node())
@@ -404,7 +404,7 @@ class AVLTree(object):
     @returns: the number of rebalancing operation due to AVL rebalancing
     """
 
-    def delete(self, node : AVLNode):
+    def delete(self, node : AVLNode):           # O(log(n))
         if self.get_root().get_size() == 1:
             self.get_root().get_parent().set_right(AVLNode.create_virtual_node())
             return 0
@@ -438,7 +438,7 @@ class AVLTree(object):
             parent.update()
         return self.balance(toBalance.get_right(), True)
 
-    def balance(self, node, is_delete=False):
+    def balance(self, node, is_delete=False):       # O(log(n))
         balance_number = 0
         parent = node.get_parent()
         while parent.get_key() != self.root.get_key():
@@ -459,7 +459,7 @@ class AVLTree(object):
     @returns: a sorted list according to key of touples (key, value) representing the data structure
     """
 
-    def avl_to_array(self):
+    def avl_to_array(self):         # O(n)
         sorted_lst = []
         current_node = self.get_root()
         while current_node.is_real_node():
@@ -490,7 +490,7 @@ class AVLTree(object):
     dictionary larger than node.key.
     """
 
-    def split(self, node: AVLNode):
+    def split(self, node: AVLNode):             # O(log(n))
         TLeft = AVLTree()
         TLeft.set_root(node.get_left())
         TRight = AVLTree()
@@ -538,7 +538,7 @@ class AVLTree(object):
         else:
             return self.real_join(tree, key, val)
 
-    def real_join(self, tree: AVLTree, key, val):
+    def real_join(self, tree: AVLTree, key, val):           # O(log(n))
         cost = self.get_root().get_height() + tree.get_root().get_height() + 1
         node_to_insert = AVLNode(key, val)
         if self.get_root().get_height() > tree.get_root().get_height():
@@ -588,7 +588,7 @@ class AVLTree(object):
     @returns: the rank of node in self
     """
 
-    def rank(self, node):
+    def rank(self, node):           # O(log(n))
         rank = 0
         current_node = self.get_root()
         while current_node.get_key() != node.get_key():
@@ -609,7 +609,7 @@ class AVLTree(object):
     @returns: the item of rank i in self
     """
 
-    def select(self, i):
+    def select(self, i):            # O(log(n))
         rank = 0
         current_node = self.get_root()
         while current_node.get_left().get_size() + 1 + rank != i:
@@ -633,10 +633,45 @@ class AVLTree(object):
         self.root.set_right(node)
 
 
+
+    def get_max(self):
+        max = self.get_root()
+        while max.is_real_node():
+            max = max.get_right()
+        return max.get_parent()
+
+    def insert_finger(self, key, val):  # O(log(n))
+        cost = 0
+        if not self.get_root().is_real_node():
+            node = AVLNode(key, val)
+            node.set_right(AVLNode.create_virtual_node())
+            node.set_left(AVLNode.create_virtual_node())
+            node.update()
+            self.set_root(node)
+            return 1
+        current_node = self.get_max()
+        while current_node.is_real_node():
+            if current_node.get_key() > key:
+                if current_node.get_parent().get_key() < key:
+                    current_node = current_node.get_parent()
+                else:
+                    current_node = current_node.get_left()
+            else:
+                current_node = current_node.get_right()
+            cost += 1
+        current_node.set_key(key)
+        current_node.set_value(val)
+        current_node.set_left(AVLNode.create_virtual_node())
+        current_node.set_right(AVLNode.create_virtual_node())
+        current_node.update()
+        return cost + self.balance(current_node)
+
+
     def display(self, root):
         lines, *_ = self._display_aux(root)
         for line in lines:
             print(line)
+
 
     def _display_aux(self, node):
         """Returns list of strings, width, height, and horizontal coordinate of the root."""
@@ -728,5 +763,5 @@ def q1 ():
 if __name__ == '__main__':
     tree = AVLTree()
     for i in range(1, 20):
-        tree.insert(i,i)
-    tree.display()
+        tree.insert_finger(i,i)
+    tree.display(tree.get_root())
