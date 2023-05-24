@@ -445,7 +445,8 @@ class AVLTree(object):
             parent.update()
             if abs(parent.get_BF()) == 2:
                 balance_number += self.roll(parent, AVLTree.calcNeededRoll(parent))
-            elif previus_height == parent.get_height:
+            elif previus_height == parent.get_height():
+                parent = parent.get_parent()
                 continue
             else:
                 balance_number += 1
@@ -724,5 +725,4 @@ class AVLTree(object):
 if __name__ == '__main__':
     tree = AVLTree()
     for i in range(1, 20):
-        tree.insert_finger(i,i)
-    tree.display(tree.get_root())
+        print(tree.insert(i,i))
