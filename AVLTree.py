@@ -640,7 +640,7 @@ class AVLTree(object):
             max = max.get_right()
         return max.get_parent()
 
-    def insert_finger(self, key, val):  # O(log(n))
+    def insert_finger(self, key, val):  # O(log(n)).
         cost = 0
         if not self.get_root().is_real_node():
             node = AVLNode(key, val)
