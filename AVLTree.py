@@ -291,6 +291,7 @@ class AVLTree(object):
     def __init__(self):
         self.root = AVLNode.create_virtual_node()
         self.root.set_right(AVLNode.create_virtual_node())
+        self.max = self.get_root()
 
     def __repr__(self):
         return f"AVLTree root {self.get_root()}"
@@ -636,10 +637,10 @@ class AVLTree(object):
 
 
     def get_max(self):
-        max = self.get_root()
-        while max.is_real_node():
-            max = max.get_right()
-        return max.get_parent()
+        return self.max
+
+    def set_max(self, node):
+        self.max = node
 
     def insert_finger(self, key, val):  # O(log(n)).
         cost = 0
@@ -651,12 +652,12 @@ class AVLTree(object):
             self.set_root(node)
             return 1
         current_node = self.get_max()
+        while current_node != self.get_root() and current_node.get_key() > key:
+            current_node = current_node.get_parent()
+            cost += 1
         while current_node.is_real_node():
             if current_node.get_key() > key:
-                if current_node != self.get_root() and current_node.get_parent().get_key() < key:
-                    current_node = current_node.get_parent()
-                else:
-                    current_node = current_node.get_left()
+                current_node = current_node.get_left()
             else:
                 current_node = current_node.get_right()
             cost += 1
@@ -665,6 +666,8 @@ class AVLTree(object):
         current_node.set_left(AVLNode.create_virtual_node())
         current_node.set_right(AVLNode.create_virtual_node())
         current_node.update()
+        if self.get_max().get_key() < key:
+            self.set_max(current_node)
         return cost + self.balance(current_node)
 
 
@@ -727,7 +730,7 @@ def arr_to_avl (arr, finger=True):
     tree = AVLTree()
     actions = 0
     for a in arr:
-        actions += tree.insert_finger (a) if finger else tree.insert(a)
+        actions += tree.insert_finger (a, a) if finger else tree.insert(a, a)
     return tree, actions
 
 def num_switches (arr):
@@ -762,6 +765,4 @@ def q1 ():
         print ('AVL Cost:', cost)
 
 if __name__ == '__main__':
-    tree = AVLTree()
-    for i in range(1, 20):
-        print(tree.insert(i,i))
+    q1()
